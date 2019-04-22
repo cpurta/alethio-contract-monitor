@@ -4,7 +4,6 @@
 
       <a href="#" class="navbar-brand">Contract Monitor</a>
 
-
       <input type="text" class="form-control mr-sm-2" placeholder="Contract Address" v-model="contractAddress">
       <button class="btn btn-outline-success my-2 my-sm-0" @click="getAllContractData">Search</button>
     </nav>
@@ -53,7 +52,7 @@
         <h5 class="card-title">Transactions Metrics</h5>
       </div>
       <div class="card-body">
-        <line-chart :chart-data="transactionsLineChartData" v-if="dataLoaded"></line-chart>
+        <line-chart :chart-data="{transactions: transactionsLineChartData, messages: messagesLineChartData}" v-if="dataLoaded"></line-chart>
       </div>
     </div>
 
@@ -84,9 +83,13 @@
   import Messages from './components/Messages'
   import LineChart from './components/LineChart'
   import DoughnutChart from './components/DoughnutChart'
+  import Header from './components/Header'
+  import Footer from './components/Footer'
 
   export default {
     components: {
+      Header,
+      Footer,
       Transactions,
       Messages,
       LineChart,
@@ -185,6 +188,16 @@
               acc[msgType] = acc[msgType] ? acc[msgType] + 1 : 1
               return acc
             }, Object.create(null)))
+
+            let messageTimes = this.transactions.reduce((acc, msg) => {
+              let t = msg.attributes.blockCreationTime * 1000
+              acc[t] = acc[t] ? acc[t] + 1 : 1
+              return acc
+            }, Object.create(null))
+
+            this.messagesLineChartData = Object.keys(messageTimes).map((key) => {
+              return {t: new Date(parseInt(key, 10)), y: messageTimes[key]}
+            }, [])
           }).catch(err => {
           console.log('unable to get messages' + err)
         })

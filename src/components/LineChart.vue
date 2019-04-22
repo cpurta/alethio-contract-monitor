@@ -1,10 +1,8 @@
 <script>
-  import { Line, mixins } from 'vue-chartjs'
-  const { reactiveProp } = mixins
+  import { Line } from 'vue-chartjs'
 
   export default {
     extends: Line,
-    mixins: [reactiveProp],
     props: {
       chartData: {
         type: Array | Object,
@@ -17,7 +15,7 @@
           scales: {
             yAxes: [{
               ticks: {
-                beginAtZero: false
+                beginAtZero: true
               },
               gridLines: {
                 display: true
@@ -38,20 +36,39 @@
         }
       }
     },
+    methods: {
+      renderData() {
+        this.renderChart({
+          datasets: [
+            {
+              label: 'transactions',
+              borderColor: '#249EBF',
+              pointBackgroundColor: 'white',
+              borderWidth: 1,
+              pointBorderColor: '#249EBF',
+              backgroundColor: 'transparent',
+              data: this.chartData.transactions
+            },
+            {
+              label: 'messages',
+              borderColor: '#bf5170',
+              pointBackgroundColor: 'white',
+              borderWidth: 1,
+              pointBorderColor: '#bf5170',
+              backgroundColor: 'transparent',
+              data: this.chartData.messages
+            }
+          ]
+        }, this.options)
+      }
+    },
+    watch: {
+      chartData() {
+        this.renderData()
+      }
+    },
     mounted () {
-      this.renderChart({
-        datasets: [
-          {
-            label: 'transactions',
-            borderColor: '#249EBF',
-            pointBackgroundColor: 'white',
-            borderWidth: 1,
-            pointBorderColor: '#249EBF',
-            backgroundColor: 'transparent',
-            data: this.chartData
-          }
-        ]
-      }, this.options)
+      this.renderData()
     }
   }
 </script>
