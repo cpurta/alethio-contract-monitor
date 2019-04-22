@@ -17,20 +17,21 @@
           scales: {
             yAxes: [{
               ticks: {
-                beginAtZero: true
+                beginAtZero: false
               },
               gridLines: {
                 display: true
               }
             }],
             xAxes: [ {
+              type: 'time',
               gridLines: {
                 display: false
               }
             }]
           },
           legend: {
-            display: false
+            display: true
           },
           responsive: true,
           maintainAspectRatio: false

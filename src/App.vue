@@ -31,10 +31,6 @@
               <p v-if="dataLoaded"><b>Balance (Ether)</b>: {{contractDetails.balance / (10**18)}}</p>
               <p v-if="dataLoaded"><b>Created On</b>: {{contractDetails.createdAt}}</p>
               <p v-if="dataLoaded"><b>Last Updated On</b>: {{retrievedAt}}</p>
-              <p v-if="dataLoaded"><b>Transaction Types:</b>: {{transactionsDoughnutChartLabels}}</p>
-              <p v-if="dataLoaded"><b>Transaction Counts:</b>: {{transactionsDoughnutChartData}}</p>
-              <p v-if="dataLoaded"><b>Message Types:</b>: {{messagesDoughnutChartLabels}}</p>
-              <p v-if="dataLoaded"><b>Message Counts:</b>: {{messagesDoughnutChartData}}</p>
             </ul>
           </div>
           <div class="col-sm chart-container" v-if="dataLoaded">
@@ -52,14 +48,25 @@
 
     <hr>
 
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title">Transactions Metrics</h5>
+      </div>
+      <div class="card-body">
+        <line-chart :chart-data="transactionsLineChartData" v-if="dataLoaded"></line-chart>
+      </div>
+    </div>
+
+    <hr>
+
     <div class="card text-center">
       <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs">
           <li class="nav-item">
-            <a href="#" class="nav-link" :class="{active: transactionsSelected}" @click="selectTransactions">Transactions</a>
+            <a class="nav-link" :class="{active: transactionsSelected}" @click="selectTransactions">Transactions</a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link" :class="{active: messagesSelected}" @click="selectMessages">Messages</a>
+            <a class="nav-link" :class="{active: messagesSelected}" @click="selectMessages">Messages</a>
           </li>
         </ul>
       </div>
@@ -68,17 +75,6 @@
         <messages :messages="messages" v-if="dataLoaded && messagesSelected"></messages>
       </div>
     </div>
-
-    <!--<hr>-->
-
-    <!--<div class="card">-->
-      <!--<div class="card-header">-->
-        <!--<h5 class="card-title">Transactions Metrics</h5>-->
-      <!--</div>-->
-      <!--<div class="card-body">-->
-        <!--<line-chart :chart-data="chartData" v-if="dataLoaded"></line-chart>-->
-      <!--</div>-->
-    <!--</div>-->
   </div>
 </template>
 
@@ -108,8 +104,10 @@
         },
         transactions: [],
         messages: [],
+        transactionsLineChartData: [],
         transactionsDoughnutChartData: [],
         transactionsDoughnutChartLabels: [],
+        messagesLineChartData: [],
         messagesDoughnutChartLabels: [],
         messagesDoughnutChartData: [],
         lineChartData: [],
@@ -143,6 +141,16 @@
               acc[funcName] = acc[funcName] ? acc[funcName] + 1 : 1
               return acc
             }, Object.create(null)))
+
+            let transactionTimes = this.transactions.reduce((acc, txn) => {
+              let t = txn.attributes.firstSeen * 1000
+              acc[t] = acc[t] ? acc[t] + 1 : 1
+              return acc
+            }, Object.create(null))
+
+            this.transactionsLineChartData = Object.keys(transactionTimes).map((key) => {
+              return {t: new Date(parseInt(key, 10)), y: transactionTimes[key]}
+            }, [])
 
           }).catch(err => {
             console.log('unable to get transactions' + err)
