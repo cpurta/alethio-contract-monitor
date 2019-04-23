@@ -29,6 +29,7 @@
             <ul class="list-group list-group-flush">
               <p v-if="dataLoaded"><b>Balance (Ether)</b>: {{contractDetails.balance / (10**18)}}</p>
               <p v-if="dataLoaded"><b>Created On</b>: {{contractDetails.createdAt}}</p>
+              <p v-if="dataLoaded"><b>Creation Block</b>: {{contractDetails.blockId}}</p>
               <p v-if="dataLoaded"><b>Last Updated On</b>: {{retrievedAt}}</p>
             </ul>
           </div>
@@ -104,6 +105,7 @@
           balance: 0,
           createdAtTimestamp: 0,
           createdAt: null,
+          blockId: '',
         },
         transactions: [],
         messages: [],
@@ -113,7 +115,6 @@
         messagesLineChartData: [],
         messagesDoughnutChartLabels: [],
         messagesDoughnutChartData: [],
-        lineChartData: [],
         polling: null,
         dataLoaded: false,
         retrievedAt: null,
@@ -122,7 +123,26 @@
       }
     },
     methods: {
+      resetState() {
+        this.showError = false
+        this.errorMessage = ''
+        this.transactions = []
+        this.messages = []
+        this.transactionsLineChartData = []
+        this.transactionsDoughnutChartData = []
+        this.transactionsDoughnutChartLabels = []
+        this.messagesLineChartData = []
+        this.messagesDoughnutChartLabels = []
+        this.messagesDoughnutChartData = []
+        this.contractDetails = {
+          balance: 0,
+            createdAtTimestamp: 0,
+            createdAt: null,
+            blockId: '',
+        }
+      },
       getAllContractData() {
+        this.resetState()
         this.getContractDetails()
         this.getContractTransactionsDetails()
         this.getContractMessages()
@@ -169,6 +189,7 @@
             this.contractDetails.balance = results.attributes.balance
             this.contractDetails.createdAtTimestamp = results.attributes.createdAtTimestamp
             this.contractDetails.createdAt = new Date(this.contractDetails.createdAtTimestamp * 1000)
+            this.contractDetails.blockId = results.relationships.createdAtBlock.data.id
           }).catch(err => {
             this.errorMessage = err.response.data.errors[0].title;
             this.showError = true
