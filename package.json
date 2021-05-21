@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "chart.js": "^2.8.0",
+    "chart.js": "^2.9.4",
     "randomcolor": "^0.5.4",
     "underscore": "^1.9.1",
     "vue": "^2.5.11",
